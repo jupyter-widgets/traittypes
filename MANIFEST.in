@@ -1,6 +1,6 @@
-CONTRIBUTING.md
-README.md
-LICENSE
+include CONTRIBUTING.md
+include README.md
+include LICENSE
 
 # Documentation
 graft docs
