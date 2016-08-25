@@ -77,7 +77,8 @@ if 'develop' in sys.argv or any(a.startswith('bdist') for a in sys.argv):
 setuptools_args = {}
 
 install_requires = setuptools_args['install_requires'] = [
-    'traitlets>=4.2.2'
+    'traitlets>=4.2.2',
+    'numpy'
 ]
 
 extras_require = setuptools_args['extras_require'] = {
