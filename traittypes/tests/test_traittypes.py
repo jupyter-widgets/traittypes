@@ -7,8 +7,9 @@
 from unittest import TestCase
 from traitlets import HasTraits, TraitError, observe
 from traitlets.tests.test_traitlets import TraitTestBase
-from traittypes import Array
+from traittypes import Array, DataFrame
 import numpy as np
+import pandas as pd
 
 
 # Good / Bad value trait test cases
@@ -39,7 +40,7 @@ class TestArray(TestCase):
     def test_array_equal(self):
         notifications = []
         class Foo(HasTraits):
-            bar = Array(default_value=[1, 2])
+            bar = Array([1, 2])
             @observe('bar')
             def _(self, change):
                 notifications.append(change)
@@ -103,3 +104,37 @@ class TestArray(TestCase):
         foo.bar = new_value
         self.assertTrue(np.array_equal(foo.bar, new_value))
 
+
+class TestDataFrame(TestCase):
+
+    def test_df_equal(self):
+        notifications = []
+        class Foo(HasTraits):
+            bar = DataFrame([1, 2])
+            @observe('bar')
+            def _(self, change):
+                notifications.append(change)
+        foo = Foo()
+        foo.bar = [1, 2]
+        self.assertFalse(len(notifications))
+        foo.bar = [1, 1]
+        self.assertTrue(len(notifications))
+
+    def test_initial_values(self):
+        class Foo(HasTraits):
+            a = DataFrame()
+            b = DataFrame(None, allow_none=True)
+            c = DataFrame([])
+        foo = Foo()
+        self.assertTrue(foo.a.equals(pd.DataFrame()))
+        self.assertTrue(foo.b is None)
+        self.assertTrue(foo.c.equals(pd.DataFrame([])))
+
+    def test_allow_none(self):
+        class Foo(HasTraits):
+            bar = DataFrame()
+            baz = DataFrame(allow_none=True)
+        foo = Foo()
+        with self.assertRaises(TraitError):
+            foo.bar = None
+        foo.baz = None
