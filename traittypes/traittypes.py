@@ -111,3 +111,37 @@ class DataFrame(SciType):
             default_value = pd.DataFrame(default_value)
         self.validators = []
         super(DataFrame, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
+
+
+class Series(SciType):
+
+    """A pandas series trait type."""
+
+    info_text = 'a pandas series'
+
+    def validate(self, obj, value):
+        if value is None and not self.allow_none:
+            self.error(obj, value)
+        try:
+            value = pd.Series(value)
+            for validator in self.validators:
+                value = validator(self, value)
+            return value
+        except (ValueError, TypeError) as e:
+            raise TraitError(e)
+
+    def set(self, obj, value):
+        new_value = self._validate(obj, value)
+        old_value = obj._trait_values.get(self.name, self.default_value)
+        obj._trait_values[self.name] = new_value
+        if (old_value is None and new_value is not None) or not old_value.equals(new_value):
+            obj._notify_trait(self.name, old_value, new_value)
+
+    def __init__(self, default_value=Undefined, allow_none=False, dtype=None, **kwargs):
+        self.dtype = dtype
+        if default_value is Undefined:
+            default_value = pd.Series()
+        elif default_value is not None:
+            default_value = pd.Series(default_value)
+        self.validators = []
+        super(Series, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)

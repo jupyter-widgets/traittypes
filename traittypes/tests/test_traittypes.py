@@ -7,7 +7,7 @@
 from unittest import TestCase
 from traitlets import HasTraits, TraitError, observe
 from traitlets.tests.test_traitlets import TraitTestBase
-from traittypes import Array, DataFrame
+from traittypes import Array, DataFrame, Series
 import numpy as np
 import pandas as pd
 
@@ -134,6 +134,41 @@ class TestDataFrame(TestCase):
         class Foo(HasTraits):
             bar = DataFrame()
             baz = DataFrame(allow_none=True)
+        foo = Foo()
+        with self.assertRaises(TraitError):
+            foo.bar = None
+        foo.baz = None
+
+
+class TestSeries(TestCase):
+
+    def test_sereis_equal(self):
+        notifications = []
+        class Foo(HasTraits):
+            bar = Series([1, 2])
+            @observe('bar')
+            def _(self, change):
+                notifications.append(change)
+        foo = Foo()
+        foo.bar = [1, 2]
+        self.assertFalse(len(notifications))
+        foo.bar = [1, 1]
+        self.assertTrue(len(notifications))
+
+    def test_initial_values(self):
+        class Foo(HasTraits):
+            a = Series()
+            b = Series(None, allow_none=True)
+            c = Series([])
+        foo = Foo()
+        self.assertTrue(foo.a.equals(pd.Series()))
+        self.assertTrue(foo.b is None)
+        self.assertTrue(foo.c.equals(pd.Series([])))
+
+    def test_allow_none(self):
+        class Foo(HasTraits):
+            bar = Series()
+            baz = Series(allow_none=True)
         foo = Foo()
         with self.assertRaises(TraitError):
             foo.bar = None
