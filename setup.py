@@ -78,7 +78,8 @@ setuptools_args = {}
 
 install_requires = setuptools_args['install_requires'] = [
     'traitlets>=4.2.2',
-    'numpy'
+    'numpy',
+    'pandas'
 ]
 
 extras_require = setuptools_args['extras_require'] = {
