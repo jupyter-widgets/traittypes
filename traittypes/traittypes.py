@@ -78,6 +78,12 @@ class Array(SciType):
         self.validators = []
         super(Array, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
 
+    def make_dynamic_default(self):
+        if self.default_value is None:
+            return self.default_value
+        else:
+            return np.copy(self.default_value)
+
 
 class DataFrame(SciType):
 
@@ -112,6 +118,12 @@ class DataFrame(SciType):
         self.validators = []
         super(DataFrame, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
 
+    def make_dynamic_default(self):
+        if self.default_value is None:
+            return self.default_value
+        else:
+            return self.default_value.copy()
+
 
 class Series(SciType):
 
@@ -145,3 +157,9 @@ class Series(SciType):
             default_value = pd.Series(default_value)
         self.validators = []
         super(Series, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
+
+    def make_dynamic_default(self):
+        if self.default_value is None:
+            return self.default_value
+        else:
+            return self.default_value.copy()

@@ -1,0 +1,40 @@
+Procedural.
+
+s = IntSlider()
+t = Text()
+dlink((s, value), (d, value), foo)
+HBox([s, t])
+
+
+Magics!!
+
+ * decorator -> example with explicit code.
+ * use of abbreviations as default values : the default values don't make sense for the function.
+ * introspection -> explicitly give the arguments?
+ * widget abbreviation -> explicit widget.
+
+
+ * future meaningful use of abbreviations
+
+def f(x : float, y : int):
+    pass
+
+interact(f)
+
+ * encode constraints in type annotations.
+
+
+
+
+
+float -> Float -> FloatWidget
+def f(x = Float(min=0, max=4), y = Int()):
+float -> Float -> FloatWidget
+
+
+def f():
+
+
+
+
+thierry monteil
