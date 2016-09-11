@@ -8,8 +8,8 @@ Trait types for NumPy, SciPy and friends
 
 Provide a reference implementation of trait types for common data structures
 used in the scipy stack such as
- - numpy arrays
- - pandas / xray data structures
+ - [numpy](https://github.com/numpy/numpy) arrays
+ - [pandas](https://github.com/pydata/pandas) and [xarray](https://github.com/pydata/xarray) data structures
 
 which are out of the scope of the main [traitlets](https://github.com/ipython/traitlets)
 project but are a common requirement to build applications with traitlets in
@@ -39,13 +39,13 @@ conda install -c conda-forge traittypes
 
 ## Usage
 
-The `Array` trait type provide an implementation of a trait type for the numpy
-array.
- - `Array` overrides some methods from `TraiType` that are generally not
-overloaded in order to work around some limitations with numpy array
-comparison.
- - `Array` provides an API for adding custom validators to constained proposed
-values for the attribute.
+`traittypes` extends the `traitlets` library with an implementation of trait types for numpy arrays, pandas dataframes and pandas series.
+ - `traittypes` works around some limitations with numpy array comparison to only trigger change events when necessary.
+ - `traittypes` also extends the traitlets API for adding custom validators to constained proposed values for the attribute.
+
+For a general introduction to `traitlets`, check out the [traitlets documentation](https://traitlets.readthedocs.io/en/stable/).
+
+### Example usage with a custom validator
 
 ```python
 from traitlets import HasTraits, TraitError
