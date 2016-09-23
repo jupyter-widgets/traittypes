@@ -1,14 +1,13 @@
 Usage
 =====
 
-The ``Array`` trait type provide an implementation of a trait type for the numpy array.
+Example: Validating the Shape of a Numpy Array
+----------------------------------------------
 
-``Array`` overrides certain public methods from ``TraitType`` that are generally not
- overloaded by custom trait types, in order to work around some limitations with
- numpy array comparison.
+We pass a validation function to the ``valid`` method of the ``Array`` trait type.
 
-``Array`` provides an API for adding custom validators to constained proposed values for the attribute.
-
+In this example, the validation function is returned by the ``shape`` closure which stores
+the tuple in its closure.
 
 .. code::
 
@@ -28,4 +27,3 @@ The ``Array`` trait type provide an implementation of a trait type for the numpy
    foo = Foo()
 
    foo.bar = [1, 2]  # Should raise a TraitError
-
