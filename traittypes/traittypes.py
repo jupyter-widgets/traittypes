@@ -5,7 +5,7 @@ import pandas as pd
 
 class SciType(TraitType):
 
-    """A base traittype for numpy arrays, pandas dataframes and series."""
+    """A base trait type for numpy arrays, pandas dataframes and series."""
 
     def valid(self, *validators):
         """
@@ -24,7 +24,8 @@ class SciType(TraitType):
         Example
         -------
 
-        .. code-block:: python
+        .. code:: python
+
             # Test with a shape constraint
             def shape(*dimensions):
                 def validator(trait, value):

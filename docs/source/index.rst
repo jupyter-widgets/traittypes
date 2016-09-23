@@ -6,6 +6,4 @@ traittypes: Trait Types for Scientific Python
 
    introduction
    usage
-
-..
    api_documentation
