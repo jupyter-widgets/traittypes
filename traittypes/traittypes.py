@@ -1,6 +1,21 @@
 from traitlets import TraitType, TraitError, Undefined
-import numpy as np
-import pandas as pd
+
+class _DelayedImportError(object):
+    def __init__(self, package_name):
+        self.package_name = package_name
+
+    def __getattribute__(self, name):
+        package_name = super(_DelayedImportError, self).__getattribute__('package_name')
+        raise RuntimeError('Missing dependency: %s' % package_name)
+
+try:
+    import numpy as np
+except ImportError:
+    np = _DelayedImportError('numpy')
+try:
+    import pandas as pd
+except ImportError:
+    pd = _DelayedImportError('pandas')
 
 
 class SciType(TraitType):
@@ -111,6 +126,7 @@ class DataFrame(SciType):
             obj._notify_trait(self.name, old_value, new_value)
 
     def __init__(self, default_value=Undefined, allow_none=False, dtype=None, **kwargs):
+        import pandas as pd
         self.dtype = dtype
         if default_value is Undefined:
             default_value = pd.DataFrame()
@@ -151,6 +167,7 @@ class Series(SciType):
             obj._notify_trait(self.name, old_value, new_value)
 
     def __init__(self, default_value=Undefined, allow_none=False, dtype=None, **kwargs):
+        import pandas as pd
         self.dtype = dtype
         if default_value is Undefined:
             default_value = pd.Series()
