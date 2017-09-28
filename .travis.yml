@@ -6,7 +6,8 @@ python:
     - 3.3
 sudo: false
 install:
-    - pip install . coveralls
+    - pip install -U pip
+    - pip install ".[test]" coveralls
 script:
     - nosetests --with-coverage --cover-package traittypes traittypes
 after_success:

@@ -78,11 +78,14 @@ setuptools_args = {}
 
 install_requires = setuptools_args['install_requires'] = [
     'traitlets>=4.2.2',
-    'numpy',
-    'pandas'
 ]
 
 extras_require = setuptools_args['extras_require'] = {
+    'test': [
+        'numpy',
+        'pandas',
+        'pytest',  # traitlets[test] require this
+    ]
 }
 
 if 'setuptools' in sys.modules:
