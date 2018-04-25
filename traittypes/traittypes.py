@@ -1,3 +1,5 @@
+import warnings
+
 from traitlets import TraitType, TraitError, Undefined
 
 class _DelayedImportError(object):
@@ -21,6 +23,10 @@ except ImportError:
 class SciType(TraitType):
 
     """A base trait type for numpy arrays, pandas dataframes and series."""
+
+    def __init__(self, **kwargs):
+        super(SciType, self).__init__(**kwargs)
+        self.validators = []
 
     def valid(self, *validators):
         """
@@ -59,6 +65,15 @@ class SciType(TraitType):
         self.validators.extend(validators)
         return self
 
+    def validate(self, obj, value):
+        """Validate the value against registered validators."""
+        try:
+            for validator in self.validators:
+                value = validator(self, value)
+            return value
+        except (ValueError, TypeError) as e:
+            raise TraitError(e)
+
 
 class Array(SciType):
 
@@ -70,13 +85,20 @@ class Array(SciType):
     def validate(self, obj, value):
         if value is None and not self.allow_none:
             self.error(obj, value)
+        if value is None or value is Undefined:
+            return super(Array, self).validate(obj, value)
         try:
-            value = np.asarray(value, dtype=self.dtype)
-            for validator in self.validators:
-                value = validator(self, value)
-            return value
+            r = np.asarray(value, dtype=self.dtype)
+            if isinstance(value, np.ndarray) and r is not value:
+                warnings.warn(
+                    'Given trait value dtype "%s" does not match required type "%s". '
+                    'A coerced copy has been created.' % (
+                        np.dtype(value.dtype).name,
+                        np.dtype(self.dtype).name))
+            value = r
         except (ValueError, TypeError) as e:
             raise TraitError(e)
+        return super(Array, self).validate(obj, value)
 
     def set(self, obj, value):
         new_value = self._validate(obj, value)
@@ -91,7 +113,6 @@ class Array(SciType):
             default_value = np.array(0, dtype=self.dtype)
         elif default_value is not None:
             default_value = np.asarray(default_value, dtype=self.dtype)
-        self.validators = []
         super(Array, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
 
     def make_dynamic_default(self):
@@ -110,13 +131,13 @@ class DataFrame(SciType):
     def validate(self, obj, value):
         if value is None and not self.allow_none:
             self.error(obj, value)
+        if value is None or value is Undefined:
+            return super(DataFrame, self).validate(obj, value)
         try:
             value = pd.DataFrame(value)
-            for validator in self.validators:
-                value = validator(self, value)
-            return value
         except (ValueError, TypeError) as e:
             raise TraitError(e)
+        return super(DataFrame, self).validate(obj, value)
 
     def set(self, obj, value):
         new_value = self._validate(obj, value)
@@ -132,7 +153,6 @@ class DataFrame(SciType):
             default_value = pd.DataFrame()
         elif default_value is not None:
             default_value = pd.DataFrame(default_value)
-        self.validators = []
         super(DataFrame, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
 
     def make_dynamic_default(self):
@@ -151,13 +171,13 @@ class Series(SciType):
     def validate(self, obj, value):
         if value is None and not self.allow_none:
             self.error(obj, value)
+        if value is None or value is Undefined:
+            return super(Series, self).validate(obj, value)
         try:
             value = pd.Series(value)
-            for validator in self.validators:
-                value = validator(self, value)
-            return value
         except (ValueError, TypeError) as e:
             raise TraitError(e)
+        return super(Series, self).validate(obj, value)
 
     def set(self, obj, value):
         new_value = self._validate(obj, value)
@@ -173,7 +193,6 @@ class Series(SciType):
             default_value = pd.Series()
         elif default_value is not None:
             default_value = pd.Series(default_value)
-        self.validators = []
         super(Series, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
 
     def make_dynamic_default(self):
