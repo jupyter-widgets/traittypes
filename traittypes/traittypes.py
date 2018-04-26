@@ -1,7 +1,7 @@
 import inspect
 import warnings
 
-from traitlets import TraitType, TraitError, Undefined
+from traitlets import TraitType, TraitError, Undefined, Sentinel
 
 class _DelayedImportError(object):
     def __init__(self, package_name):
@@ -19,6 +19,13 @@ try:
     import pandas as pd
 except ImportError:
     pd = _DelayedImportError('pandas')
+
+
+Empty = Sentinel('Empty', 'traittypes',
+"""
+Used in traittypes to specify that the default value should
+be an empty dataset
+""")
 
 
 class SciType(TraitType):
@@ -108,16 +115,16 @@ class Array(SciType):
         if not np.array_equal(old_value, new_value):
             obj._notify_trait(self.name, old_value, new_value)
 
-    def __init__(self, default_value=Undefined, allow_none=False, dtype=None, **kwargs):
+    def __init__(self, default_value=Empty, allow_none=False, dtype=None, **kwargs):
         self.dtype = dtype
-        if default_value is Undefined:
+        if default_value is Empty:
             default_value = np.array(0, dtype=self.dtype)
-        elif default_value is not None:
+        elif default_value is not None and default_value is not Undefined:
             default_value = np.asarray(default_value, dtype=self.dtype)
         super(Array, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
 
     def make_dynamic_default(self):
-        if self.default_value is None:
+        if self.default_value is None or self.default_value is Undefined:
             return self.default_value
         else:
             return np.copy(self.default_value)
@@ -146,10 +153,12 @@ class PandasType(SciType):
         new_value = self._validate(obj, value)
         old_value = obj._trait_values.get(self.name, self.default_value)
         obj._trait_values[self.name] = new_value
-        if (old_value is None and new_value is not None) or not old_value.equals(new_value):
+        if ((old_value is None and new_value is not None) or
+                (old_value is Undefined and new_value is not Undefined) or
+                not old_value.equals(new_value)):
             obj._notify_trait(self.name, old_value, new_value)
 
-    def __init__(self, default_value=Undefined, allow_none=False, dtype=None, klass=None, **kwargs):
+    def __init__(self, default_value=Empty, allow_none=False, dtype=None, klass=None, **kwargs):
         if klass is None:
             klass = self.klass
         if (klass is not None) and inspect.isclass(klass):
@@ -158,14 +167,14 @@ class PandasType(SciType):
             raise TraitError('The klass attribute must be a class'
                                 ' not: %r' % klass)
         self.dtype = dtype
-        if default_value is Undefined:
+        if default_value is Empty:
             default_value = klass()
-        elif default_value is not None:
+        elif default_value is not None and default_value is not Undefined:
             default_value = klass(default_value)
         super(PandasType, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
 
     def make_dynamic_default(self):
-        if self.default_value is None:
+        if self.default_value is None or self.default_value is Undefined:
             return self.default_value
         else:
             return self.default_value.copy()
@@ -177,7 +186,7 @@ class DataFrame(PandasType):
 
     info_text = 'a pandas dataframe'
 
-    def __init__(self, default_value=Undefined, allow_none=False, dtype=None, **kwargs):
+    def __init__(self, default_value=Empty, allow_none=False, dtype=None, **kwargs):
         if 'klass' not in kwargs and self.klass is None:
             import pandas as pd
             kwargs['klass'] = pd.DataFrame
@@ -191,7 +200,7 @@ class Series(PandasType):
 
     info_text = 'a pandas series'
 
-    def __init__(self, default_value=Undefined, allow_none=False, dtype=None, **kwargs):
+    def __init__(self, default_value=Empty, allow_none=False, dtype=None, **kwargs):
         if 'klass' not in kwargs and self.klass is None:
             import pandas as pd
             kwargs['klass'] = pd.Series

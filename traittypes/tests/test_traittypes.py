@@ -5,7 +5,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 from unittest import TestCase
-from traitlets import HasTraits, TraitError, observe
+from traitlets import HasTraits, TraitError, observe, Undefined
 from traitlets.tests.test_traitlets import TraitTestBase
 from traittypes import Array, DataFrame, Series
 import numpy as np
@@ -56,11 +56,13 @@ class TestArray(TestCase):
             b = Array(dtype='int')
             c = Array(None, allow_none=True)
             d = Array([])
+            e = Array(Undefined)
         foo = Foo()
         self.assertTrue(np.array_equal(foo.a, np.array(0)))
         self.assertTrue(np.array_equal(foo.b, np.array(0)))
         self.assertTrue(foo.c is None)
         self.assertTrue(np.array_equal(foo.d, []))
+        self.assertTrue(foo.e is Undefined)
 
     def test_allow_none(self):
         class Foo(HasTraits):
@@ -116,19 +118,21 @@ class TestDataFrame(TestCase):
                 notifications.append(change)
         foo = Foo()
         foo.bar = [1, 2]
-        self.assertFalse(len(notifications))
+        self.assertEqual(notifications, [])
         foo.bar = [1, 1]
-        self.assertTrue(len(notifications))
+        self.assertEqual(len(notifications), 1)
 
     def test_initial_values(self):
         class Foo(HasTraits):
             a = DataFrame()
             b = DataFrame(None, allow_none=True)
             c = DataFrame([])
+            d = DataFrame(Undefined)
         foo = Foo()
         self.assertTrue(foo.a.equals(pd.DataFrame()))
         self.assertTrue(foo.b is None)
         self.assertTrue(foo.c.equals(pd.DataFrame([])))
+        self.assertTrue(foo.d is Undefined)
 
     def test_allow_none(self):
         class Foo(HasTraits):
@@ -142,7 +146,7 @@ class TestDataFrame(TestCase):
 
 class TestSeries(TestCase):
 
-    def test_sereis_equal(self):
+    def test_series_equal(self):
         notifications = []
         class Foo(HasTraits):
             bar = Series([1, 2])
@@ -151,19 +155,21 @@ class TestSeries(TestCase):
                 notifications.append(change)
         foo = Foo()
         foo.bar = [1, 2]
-        self.assertFalse(len(notifications))
+        self.assertEqual(notifications, [])
         foo.bar = [1, 1]
-        self.assertTrue(len(notifications))
+        self.assertEqual(len(notifications), 1)
 
     def test_initial_values(self):
         class Foo(HasTraits):
             a = Series()
             b = Series(None, allow_none=True)
             c = Series([])
+            d = Series(Undefined)
         foo = Foo()
         self.assertTrue(foo.a.equals(pd.Series()))
         self.assertTrue(foo.b is None)
         self.assertTrue(foo.c.equals(pd.Series([])))
+        self.assertTrue(foo.d is Undefined)
 
     def test_allow_none(self):
         class Foo(HasTraits):
