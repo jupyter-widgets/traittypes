@@ -1,3 +1,4 @@
+import inspect
 import warnings
 
 from traitlets import TraitType, TraitError, Undefined
@@ -122,22 +123,24 @@ class Array(SciType):
             return np.copy(self.default_value)
 
 
-class DataFrame(SciType):
+class PandasType(SciType):
 
     """A pandas dataframe trait type."""
 
     info_text = 'a pandas dataframe'
 
+    klass = None
+
     def validate(self, obj, value):
         if value is None and not self.allow_none:
             self.error(obj, value)
         if value is None or value is Undefined:
-            return super(DataFrame, self).validate(obj, value)
+            return super(PandasType, self).validate(obj, value)
         try:
-            value = pd.DataFrame(value)
+            value = self.klass(value)
         except (ValueError, TypeError) as e:
             raise TraitError(e)
-        return super(DataFrame, self).validate(obj, value)
+        return super(PandasType, self).validate(obj, value)
 
     def set(self, obj, value):
         new_value = self._validate(obj, value)
@@ -146,14 +149,20 @@ class DataFrame(SciType):
         if (old_value is None and new_value is not None) or not old_value.equals(new_value):
             obj._notify_trait(self.name, old_value, new_value)
 
-    def __init__(self, default_value=Undefined, allow_none=False, dtype=None, **kwargs):
-        import pandas as pd
+    def __init__(self, default_value=Undefined, allow_none=False, dtype=None, klass=None, **kwargs):
+        if klass is None:
+            klass = self.klass
+        if (klass is not None) and inspect.isclass(klass):
+            self.klass = klass
+        else:
+            raise TraitError('The klass attribute must be a class'
+                                ' not: %r' % klass)
         self.dtype = dtype
         if default_value is Undefined:
-            default_value = pd.DataFrame()
+            default_value = klass()
         elif default_value is not None:
-            default_value = pd.DataFrame(default_value)
-        super(DataFrame, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
+            default_value = klass(default_value)
+        super(PandasType, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
 
     def make_dynamic_default(self):
         if self.default_value is None:
@@ -162,41 +171,29 @@ class DataFrame(SciType):
             return self.default_value.copy()
 
 
-class Series(SciType):
+class DataFrame(PandasType):
+
+    """A pandas dataframe trait type."""
+
+    info_text = 'a pandas dataframe'
+
+    def __init__(self, default_value=Undefined, allow_none=False, dtype=None, **kwargs):
+        if 'klass' not in kwargs and self.klass is None:
+            import pandas as pd
+            kwargs['klass'] = pd.DataFrame
+        super(DataFrame, self).__init__(
+            default_value=default_value, allow_none=allow_none, dtype=dtype, **kwargs)
+
+
+class Series(PandasType):
 
     """A pandas series trait type."""
 
     info_text = 'a pandas series'
 
-    def validate(self, obj, value):
-        if value is None and not self.allow_none:
-            self.error(obj, value)
-        if value is None or value is Undefined:
-            return super(Series, self).validate(obj, value)
-        try:
-            value = pd.Series(value)
-        except (ValueError, TypeError) as e:
-            raise TraitError(e)
-        return super(Series, self).validate(obj, value)
-
-    def set(self, obj, value):
-        new_value = self._validate(obj, value)
-        old_value = obj._trait_values.get(self.name, self.default_value)
-        obj._trait_values[self.name] = new_value
-        if (old_value is None and new_value is not None) or not old_value.equals(new_value):
-            obj._notify_trait(self.name, old_value, new_value)
-
     def __init__(self, default_value=Undefined, allow_none=False, dtype=None, **kwargs):
-        import pandas as pd
-        self.dtype = dtype
-        if default_value is Undefined:
-            default_value = pd.Series()
-        elif default_value is not None:
-            default_value = pd.Series(default_value)
-        super(Series, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
-
-    def make_dynamic_default(self):
-        if self.default_value is None:
-            return self.default_value
-        else:
-            return self.default_value.copy()
+        if 'klass' not in kwargs and self.klass is None:
+            import pandas as pd
+            kwargs['klass'] = pd.Series
+        super(Series, self).__init__(
+            default_value=default_value, allow_none=allow_none, dtype=dtype, **kwargs)
