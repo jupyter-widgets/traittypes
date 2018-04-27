@@ -3,8 +3,17 @@ LICENSE
 README.md
 setup.cfg
 setup.py
+docs/Makefile
+docs/make.bat
+docs/requirements.txt
+docs/source/api_documentation.rst
+docs/source/conf.py
+docs/source/index.rst
+docs/source/introduction.rst
+docs/source/usage.rst
 traittypes/__init__.py
 traittypes/_version.py
 traittypes/traittypes.py
 traittypes/tests/__init__.py
+traittypes/tests/test_import_errors.py
 traittypes/tests/test_traittypes.py
