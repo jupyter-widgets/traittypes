@@ -17,3 +17,4 @@ traittypes/traittypes.py
 traittypes/tests/__init__.py
 traittypes/tests/test_import_errors.py
 traittypes/tests/test_traittypes.py
+traittypes/tests/test_validators.py
