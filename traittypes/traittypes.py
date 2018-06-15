@@ -15,14 +15,6 @@ try:
     import numpy as np
 except ImportError:
     np = _DelayedImportError('numpy')
-try:
-    import pandas as pd
-except ImportError:
-    pd = _DelayedImportError('pandas')
-try:
-    import xarray as xr
-except ImportError:
-    xr = _DelayedImportError('xarray')
 
 
 Empty = Sentinel('Empty', 'traittypes',
