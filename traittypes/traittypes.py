@@ -19,6 +19,10 @@ try:
     import pandas as pd
 except ImportError:
     pd = _DelayedImportError('pandas')
+try:
+    import xarray as xr
+except ImportError:
+    xr = _DelayedImportError('xarray')
 
 
 Empty = Sentinel('Empty', 'traittypes',
@@ -30,7 +34,7 @@ be an empty dataset
 
 class SciType(TraitType):
 
-    """A base trait type for numpy arrays, pandas dataframes and series."""
+    """A base trait type for numpy arrays, pandas dataframes, pandas series and xarray datasets."""
 
     def __init__(self, **kwargs):
         super(SciType, self).__init__(**kwargs)
@@ -205,4 +209,68 @@ class Series(PandasType):
             import pandas as pd
             kwargs['klass'] = pd.Series
         super(Series, self).__init__(
+            default_value=default_value, allow_none=allow_none, dtype=dtype, **kwargs)
+
+
+class XarrayType(SciType):
+
+    """An xarray dataset trait type."""
+
+    info_text = 'an xarray dataset'
+
+    klass = None
+
+    def validate(self, obj, value):
+        if value is None and not self.allow_none:
+            self.error(obj, value)
+        if value is None or value is Undefined:
+            return super(XarrayType, self).validate(obj, value)
+        try:
+            value = self.klass(value)
+        except (ValueError, TypeError) as e:
+            raise TraitError(e)
+        return super(XarrayType, self).validate(obj, value)
+
+    def set(self, obj, value):
+        new_value = self._validate(obj, value)
+        old_value = obj._trait_values.get(self.name, self.default_value)
+        obj._trait_values[self.name] = new_value
+        if ((old_value is None and new_value is not None) or
+                (old_value is Undefined and new_value is not Undefined) or
+                not old_value.equals(new_value)):
+            obj._notify_trait(self.name, old_value, new_value)
+
+    def __init__(self, default_value=Empty, allow_none=False, dtype=None, klass=None, **kwargs):
+        if klass is None:
+            klass = self.klass
+        if (klass is not None) and inspect.isclass(klass):
+            self.klass = klass
+        else:
+            raise TraitError('The klass attribute must be a class'
+                                ' not: %r' % klass)
+        self.dtype = dtype
+        if default_value is Empty:
+            default_value = klass()
+        elif default_value is not None and default_value is not Undefined:
+            default_value = klass(default_value)
+        super(XarrayType, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
+
+    def make_dynamic_default(self):
+        if self.default_value is None or self.default_value is Undefined:
+            return self.default_value
+        else:
+            return self.default_value.copy()
+
+
+class Dataset(XarrayType):
+
+    """An xarray dataset trait type."""
+
+    info_text = 'an xarray dataset'
+
+    def __init__(self, default_value=Empty, allow_none=False, dtype=None, **kwargs):
+        if 'klass' not in kwargs and self.klass is None:
+            import xarray as xr
+            kwargs['klass'] = xr.Dataset
+        super(Dataset, self).__init__(
             default_value=default_value, allow_none=allow_none, dtype=dtype, **kwargs)

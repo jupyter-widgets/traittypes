@@ -20,3 +20,7 @@ The ``DataFrame`` trait type holds a pandas DataFrame.
 The ``Series`` trait type holds a pandas Series.
 
 .. autoclass:: traittypes.traittypes.Series
+
+The ``Dataset`` trait type holds an xarray Dataset.
+
+.. autoclass:: traittypes.traittypes.Dataset

@@ -7,9 +7,10 @@
 from unittest import TestCase
 from traitlets import HasTraits, TraitError, observe, Undefined
 from traitlets.tests.test_traitlets import TraitTestBase
-from traittypes import Array, DataFrame, Series
+from traittypes import Array, DataFrame, Series, Dataset
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 
 # Good / Bad value trait test cases
@@ -175,6 +176,43 @@ class TestSeries(TestCase):
         class Foo(HasTraits):
             bar = Series()
             baz = Series(allow_none=True)
+        foo = Foo()
+        with self.assertRaises(TraitError):
+            foo.bar = None
+        foo.baz = None
+
+
+class TestDataset(TestCase):
+
+    def test_ds_equal(self):
+        notifications = []
+        class Foo(HasTraits):
+            bar = Dataset({'foo': xr.DataArray([[0, 1, 2], [3, 4, 5]], coords={'x': ['a', 'b']}, dims=('x', 'y')), 'bar': ('x', [1, 2]), 'baz': 3.14})
+            @observe('bar')
+            def _(self, change):
+                notifications.append(change)
+        foo = Foo()
+        foo.bar = {'foo': xr.DataArray([[0, 1, 2], [3, 4, 5]], coords={'x': ['a', 'b']}, dims=('x', 'y')), 'bar': ('x', [1, 2]), 'baz': 3.14}
+        self.assertEqual(notifications, [])
+        foo.bar = {'foo': xr.DataArray([[0, 1, 2], [3, 4, 5]], coords={'x': ['a', 'b']}, dims=('x', 'y')), 'bar': ('x', [1, 2]), 'baz': 3.15}
+        self.assertEqual(len(notifications), 1)
+
+    def test_initial_values(self):
+        class Foo(HasTraits):
+            a = Dataset()
+            b = Dataset(None, allow_none=True)
+            c = Dataset([])
+            d = Dataset(Undefined)
+        foo = Foo()
+        self.assertTrue(foo.a.equals(xr.Dataset()))
+        self.assertTrue(foo.b is None)
+        self.assertTrue(foo.c.equals(xr.Dataset([])))
+        self.assertTrue(foo.d is Undefined)
+
+    def test_allow_none(self):
+        class Foo(HasTraits):
+            bar = Dataset()
+            baz = Dataset(allow_none=True)
         foo = Foo()
         with self.assertRaises(TraitError):
             foo.bar = None
