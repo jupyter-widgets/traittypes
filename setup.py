@@ -85,6 +85,7 @@ extras_require = setuptools_args['extras_require'] = {
     'test': [
         'numpy',
         'pandas',
+        'xarray',
         'pytest',  # traitlets[test] require this
     ]
 }

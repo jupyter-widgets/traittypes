@@ -40,7 +40,7 @@ conda install -c conda-forge traittypes
 
 ## Usage
 
-`traittypes` extends the `traitlets` library with an implementation of trait types for numpy arrays, pandas dataframes and pandas series.
+`traittypes` extends the `traitlets` library with an implementation of trait types for numpy arrays, pandas dataframes, pandas series, xarray datasets and xarray dataarrays.
  - `traittypes` works around some limitations with numpy array comparison to only trigger change events when necessary.
  - `traittypes` also extends the traitlets API for adding custom validators to constained proposed values for the attribute.
 
