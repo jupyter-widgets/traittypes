@@ -24,3 +24,7 @@ The ``Series`` trait type holds a pandas Series.
 The ``Dataset`` trait type holds an xarray Dataset.
 
 .. autoclass:: traittypes.traittypes.Dataset
+
+The ``DataArray`` trait type holds an xarray DataArray.
+
+.. autoclass:: traittypes.traittypes.DataArray

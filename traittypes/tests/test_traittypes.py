@@ -7,7 +7,7 @@
 from unittest import TestCase
 from traitlets import HasTraits, TraitError, observe, Undefined
 from traitlets.tests.test_traitlets import TraitTestBase
-from traittypes import Array, DataFrame, Series, Dataset
+from traittypes import Array, DataFrame, Series, Dataset, DataArray
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -201,12 +201,10 @@ class TestDataset(TestCase):
         class Foo(HasTraits):
             a = Dataset()
             b = Dataset(None, allow_none=True)
-            c = Dataset([])
             d = Dataset(Undefined)
         foo = Foo()
         self.assertTrue(foo.a.equals(xr.Dataset()))
         self.assertTrue(foo.b is None)
-        self.assertTrue(foo.c.equals(xr.Dataset([])))
         self.assertTrue(foo.d is Undefined)
 
     def test_allow_none(self):
@@ -217,3 +215,29 @@ class TestDataset(TestCase):
         with self.assertRaises(TraitError):
             foo.bar = None
         foo.baz = None
+
+
+class TestDataArray(TestCase):
+
+    def test_ds_equal(self):
+        notifications = []
+        class Foo(HasTraits):
+            bar = DataArray([[0, 1], [2, 3]])
+            @observe('bar')
+            def _(self, change):
+                notifications.append(change)
+        foo = Foo()
+        foo.bar = [[0, 1], [2, 3]]
+        self.assertEqual(notifications, [])
+        foo.bar = [[0, 1], [2, 4]]
+        self.assertEqual(len(notifications), 1)
+
+    def test_initial_values(self):
+        class Foo(HasTraits):
+            b = DataArray(None, allow_none=True)
+            c = DataArray([])
+            d = DataArray(Undefined)
+        foo = Foo()
+        self.assertTrue(foo.b is None)
+        self.assertTrue(foo.c.equals(xr.DataArray([])))
+        self.assertTrue(foo.d is Undefined)

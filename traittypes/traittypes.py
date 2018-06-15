@@ -26,7 +26,7 @@ be an empty dataset
 
 class SciType(TraitType):
 
-    """A base trait type for numpy arrays, pandas dataframes, pandas series and xarray datasets."""
+    """A base trait type for numpy arrays, pandas dataframes, pandas series, xarray datasets and xarray dataarrays."""
 
     def __init__(self, **kwargs):
         super(SciType, self).__init__(**kwargs)
@@ -128,9 +128,9 @@ class Array(SciType):
 
 class PandasType(SciType):
 
-    """A pandas dataframe trait type."""
+    """A pandas dataframe or series trait type."""
 
-    info_text = 'a pandas dataframe'
+    info_text = 'a pandas dataframe or series'
 
     klass = None
 
@@ -154,7 +154,7 @@ class PandasType(SciType):
                 not old_value.equals(new_value)):
             obj._notify_trait(self.name, old_value, new_value)
 
-    def __init__(self, default_value=Empty, allow_none=False, dtype=None, klass=None, **kwargs):
+    def __init__(self, default_value=Empty, allow_none=False, klass=None, **kwargs):
         if klass is None:
             klass = self.klass
         if (klass is not None) and inspect.isclass(klass):
@@ -162,7 +162,6 @@ class PandasType(SciType):
         else:
             raise TraitError('The klass attribute must be a class'
                                 ' not: %r' % klass)
-        self.dtype = dtype
         if default_value is Empty:
             default_value = klass()
         elif default_value is not None and default_value is not Undefined:
@@ -195,6 +194,7 @@ class Series(PandasType):
     """A pandas series trait type."""
 
     info_text = 'a pandas series'
+    dtype = None
 
     def __init__(self, default_value=Empty, allow_none=False, dtype=None, **kwargs):
         if 'klass' not in kwargs and self.klass is None:
@@ -202,13 +202,14 @@ class Series(PandasType):
             kwargs['klass'] = pd.Series
         super(Series, self).__init__(
             default_value=default_value, allow_none=allow_none, dtype=dtype, **kwargs)
+        self.dtype = dtype
 
 
 class XarrayType(SciType):
 
-    """An xarray dataset trait type."""
+    """An xarray dataset or dataarray trait type."""
 
-    info_text = 'an xarray dataset'
+    info_text = 'an xarray dataset or dataarray'
 
     klass = None
 
@@ -232,7 +233,7 @@ class XarrayType(SciType):
                 not old_value.equals(new_value)):
             obj._notify_trait(self.name, old_value, new_value)
 
-    def __init__(self, default_value=Empty, allow_none=False, dtype=None, klass=None, **kwargs):
+    def __init__(self, default_value=Empty, allow_none=False, klass=None, **kwargs):
         if klass is None:
             klass = self.klass
         if (klass is not None) and inspect.isclass(klass):
@@ -240,7 +241,6 @@ class XarrayType(SciType):
         else:
             raise TraitError('The klass attribute must be a class'
                                 ' not: %r' % klass)
-        self.dtype = dtype
         if default_value is Empty:
             default_value = klass()
         elif default_value is not None and default_value is not Undefined:
@@ -266,3 +266,19 @@ class Dataset(XarrayType):
             kwargs['klass'] = xr.Dataset
         super(Dataset, self).__init__(
             default_value=default_value, allow_none=allow_none, dtype=dtype, **kwargs)
+
+
+class DataArray(XarrayType):
+
+    """An xarray dataarray trait type."""
+
+    info_text = 'an xarray dataarray'
+    dtype = None
+
+    def __init__(self, default_value=Empty, allow_none=False, dtype=None, **kwargs):
+        if 'klass' not in kwargs and self.klass is None:
+            import xarray as xr
+            kwargs['klass'] = xr.DataArray
+        super(DataArray, self).__init__(
+            default_value=default_value, allow_none=allow_none, dtype=dtype, **kwargs)
+        self.dtype = dtype
