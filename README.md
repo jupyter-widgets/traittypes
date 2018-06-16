@@ -1,6 +1,6 @@
 # Scipy Trait Types
 
-[![Build Status](https://travis-ci.org/jupyter-incubator/traittypes.svg?branch=master)](https://travis-ci.org/jupyter-incubator/traittypes)
+[![Build Status](https://travis-ci.org/jupyter-widgets/traittypes.svg?branch=master)](https://travis-ci.org/jupyter-widgets/traittypes)
 [![Documentation Status](https://readthedocs.org/projects/traittypes/badge/?version=latest)](http://traittypes.readthedocs.org/en/latest/?badge=latest)
 
 Trait types for NumPy, SciPy and friends

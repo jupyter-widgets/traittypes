@@ -59,3 +59,5 @@ target/
 
 # OS X
 .DS_Store
+
+.pytest_cache/
