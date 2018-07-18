@@ -1,7 +1,8 @@
 import inspect
 import warnings
 
-from traitlets import TraitType, TraitError, Undefined, Sentinel
+from traitlets import TraitType, TraitError, Undefined
+from .utils import Sentinel
 
 class _DelayedImportError(object):
     def __init__(self, package_name):
