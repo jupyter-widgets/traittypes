@@ -17,7 +17,7 @@ import xarray as xr
 
 
 class IntArrayTrait(HasTraits):
-    value = Array().tag(dtype=np.int)
+    value = Array(dtype=np.int)
 
 
 class TestIntArray(TraitTestBase):
@@ -27,7 +27,7 @@ class TestIntArray(TraitTestBase):
     obj = IntArrayTrait()
 
     _good_values = [1, [1, 2, 3], [[1, 2, 3], [4, 5, 6]], np.array([1])]
-    _bad_values = [[1, [0, 0]]]
+    _bad_values = [[1, [0, 0]], ['str'], 'str']
 
     def assertEqual(self, v1, v2):
         return np.testing.assert_array_equal(v1, v2)
