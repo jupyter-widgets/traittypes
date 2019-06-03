@@ -1,6 +1,7 @@
 import inspect
 import warnings
 
+from spectate import mvc
 from traitlets import TraitType, TraitError, Undefined
 from .utils import Sentinel
 
@@ -283,3 +284,78 @@ class DataArray(XarrayType):
         super(DataArray, self).__init__(
             default_value=default_value, allow_none=allow_none, dtype=dtype, **kwargs)
         self.dtype = dtype
+
+
+class Mutable(TraitType):
+
+    _model_type = None
+    _event_type = None
+
+    def instance_init(self, obj):
+        default = self._model_type()
+
+        @mvc.view(default)
+        def callback(default, events):
+            change = dict(
+                self._make_change(events),
+                name=self.name,
+                type=self._event_type,
+            )
+            obj.notify_change(change)
+
+        setattr(obj, self.name, default)
+
+    def _make_change(self, events):
+        raise NotImplementedError()
+
+
+class MutableDict(Mutable):
+
+    _model_type = mvc.Dict
+    _event_type = "item"
+
+    def _make_change(self, events):
+        change = {"old": {}, "new": {}}
+        for e in events:
+            change["new"][e.key] = e.new
+            change["old"][e.key] = e.old
+        return change
+
+
+class MutableList(Mutable):
+
+    _model_type = mvc.List
+    _event_type = "item"
+
+    def _make_change(self, events):
+        change = {"old": {}, "new": {}}
+        for e in events:
+            change["new"][e.index] = e.new
+            change["old"][e.index] = e.old
+        return change
+
+
+class MutableSet(Mutable):
+
+    _model_type = mvc.Set
+    _event_type = "item"
+
+    def _make_change(self, events):
+        change = {"old": set(), "new": set()}
+        for e in events:
+            change["new"].update(e.new)
+            change["old"].update(e.old)
+        return change
+
+
+class MutableObj(Mutable):
+
+    _model_type = mvc.Object
+    _event_type = "item"
+
+    def _make_change(self, events):
+        change = {"old": {}, "new": {}}
+        for e in events:
+            change["new"][e.attr] = e.new
+            change["old"][e.attr] = e.old
+        return change
