@@ -83,7 +83,9 @@ install_requires = setuptools_args['install_requires'] = [
 
 extras_require = setuptools_args['extras_require'] = {
     'test': [
-        'numpy',
+        # TestIntArray.test_bad_values fails with numpy>=1.16.0
+        'numpy<1.16.0',
+
         'pandas',
         'xarray',
         'pytest',  # traitlets[test] require this
