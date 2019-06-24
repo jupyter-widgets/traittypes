@@ -17,7 +17,7 @@ import xarray as xr
 
 
 class IntArrayTrait(HasTraits):
-    value = Array(dtype=np.int).tag(dtype=np.int)
+    value = Array(dtype=np.int)
 
 
 class TestIntArray(TraitTestBase):
