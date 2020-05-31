@@ -27,7 +27,6 @@ class TestIntArray(TraitTestBase):
     obj = IntArrayTrait()
 
     _good_values = [1, [1, 2, 3], [[1, 2, 3], [4, 5, 6]], np.array([1])]
-    _bad_values = [[1, [0, 0]]]
 
     def assertEqual(self, v1, v2):
         return np.testing.assert_array_equal(v1, v2)
