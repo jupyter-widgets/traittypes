@@ -9,6 +9,6 @@ install:
     - pip install -U --upgrade-strategy eager ".[test]" coveralls
     - pip freeze
 script:
-    - nosetests --with-coverage --cover-package traittypes traittypes
+    - pytest --cov=traittypes traittypes
 after_success:
     - coveralls

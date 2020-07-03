@@ -1,10 +1,11 @@
 
-import nose.tools as nt
+from unittest import TestCase
 
 from ..traittypes import _DelayedImportError
 
 
-@nt.raises(RuntimeError)
-def test_delayed_access_raises():
-    dummy = _DelayedImportError('mypackage')
-    dummy.asarray([1, 2, 3])
+class TestError(TestCase):
+    def test_delayed_access_raises(self):
+        dummy = _DelayedImportError('mypackage')
+        with self.assertRaises(RuntimeError):
+            dummy.asarray([1, 2, 3])
