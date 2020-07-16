@@ -1,11 +1,9 @@
 
-from unittest import TestCase
+import pytest
 
 from ..traittypes import _DelayedImportError
 
-
-class TestError(TestCase):
-    def test_delayed_access_raises(self):
-        dummy = _DelayedImportError('mypackage')
-        with self.assertRaises(RuntimeError):
-            dummy.asarray([1, 2, 3])
+def test_delayed_access_raises():
+    dummy = _DelayedImportError('mypackage')
+    with pytest.raises(RuntimeError):
+        dummy.asarray([1, 2, 3])
