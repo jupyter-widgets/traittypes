@@ -6,9 +6,9 @@ python:
 sudo: false
 install:
     - pip install -U pip
-    - pip install -U --upgrade-strategy eager ".[test]" coveralls
+    - pip install -U --upgrade-strategy eager ".[test]" coveralls pytest-cov
     - pip freeze
 script:
-    - nosetests --with-coverage --cover-package traittypes traittypes
+    - pytest --cov=traittypes traittypes
 after_success:
     - coveralls

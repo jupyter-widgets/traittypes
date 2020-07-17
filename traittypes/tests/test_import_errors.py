@@ -1,10 +1,9 @@
 
-import nose.tools as nt
+import pytest
 
 from ..traittypes import _DelayedImportError
 
-
-@nt.raises(RuntimeError)
 def test_delayed_access_raises():
     dummy = _DelayedImportError('mypackage')
-    dummy.asarray([1, 2, 3])
+    with pytest.raises(RuntimeError):
+        dummy.asarray([1, 2, 3])
