@@ -56,13 +56,11 @@ class TestArray(TestCase):
             b = Array(dtype='int')
             c = Array(None, allow_none=True)
             d = Array([])
-            e = Array(Undefined)
         foo = Foo()
         self.assertTrue(np.array_equal(foo.a, np.array(0)))
         self.assertTrue(np.array_equal(foo.b, np.array(0)))
         self.assertTrue(foo.c is None)
         self.assertTrue(np.array_equal(foo.d, []))
-        self.assertTrue(foo.e is Undefined)
 
     def test_allow_none(self):
         class Foo(HasTraits):
@@ -127,12 +125,10 @@ class TestDataFrame(TestCase):
             a = DataFrame()
             b = DataFrame(None, allow_none=True)
             c = DataFrame([])
-            d = DataFrame(Undefined)
         foo = Foo()
         self.assertTrue(foo.a.equals(pd.DataFrame()))
         self.assertTrue(foo.b is None)
         self.assertTrue(foo.c.equals(pd.DataFrame([])))
-        self.assertTrue(foo.d is Undefined)
 
     def test_allow_none(self):
         class Foo(HasTraits):
@@ -164,12 +160,10 @@ class TestSeries(TestCase):
             a = Series()
             b = Series(None, allow_none=True)
             c = Series([])
-            d = Series(Undefined)
         foo = Foo()
         self.assertTrue(foo.a.equals(pd.Series()))
         self.assertTrue(foo.b is None)
         self.assertTrue(foo.c.equals(pd.Series([])))
-        self.assertTrue(foo.d is Undefined)
 
     def test_allow_none(self):
         class Foo(HasTraits):
@@ -200,11 +194,9 @@ class TestDataset(TestCase):
         class Foo(HasTraits):
             a = Dataset()
             b = Dataset(None, allow_none=True)
-            d = Dataset(Undefined)
         foo = Foo()
         self.assertTrue(foo.a.equals(xr.Dataset()))
         self.assertTrue(foo.b is None)
-        self.assertTrue(foo.d is Undefined)
 
     def test_allow_none(self):
         class Foo(HasTraits):
@@ -235,8 +227,6 @@ class TestDataArray(TestCase):
         class Foo(HasTraits):
             b = DataArray(None, allow_none=True)
             c = DataArray([])
-            d = DataArray(Undefined)
         foo = Foo()
         self.assertTrue(foo.b is None)
         self.assertTrue(foo.c.equals(xr.DataArray([])))
-        self.assertTrue(foo.d is Undefined)
