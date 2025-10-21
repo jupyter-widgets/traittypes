@@ -1,0 +1,34 @@
+name: Tests
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - uses: mamba-org/setup-micromamba@v2
+      with:
+        environment-name: test-env
+        create-args: >-
+          python=3.13
+          pip
+
+    - name: Install
+      run: pip install eager ".[test]" coveralls pytest-cov
+
+    - name: Test coverage
+      run: pytest --cov=traittypes traittypes
