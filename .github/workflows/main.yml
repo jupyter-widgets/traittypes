@@ -24,7 +24,7 @@ jobs:
       with:
         environment-name: test-env
         create-args: >-
-          python=3.13
+          python=3.10
           pip
 
     - name: Install
