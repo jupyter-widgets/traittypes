@@ -17,12 +17,12 @@ import xarray as xr
 
 
 class IntArrayTrait(HasTraits):
-    value = Array().tag(dtype=np.int)
+    value = Array().tag(dtype=np.int32)
 
 
 class TestIntArray(TraitTestBase):
     """
-    Test dtype validation with a ``dtype=np.int``
+    Test dtype validation with a ``dtype=np.int32``
     """
     obj = IntArrayTrait()
 
