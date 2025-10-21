@@ -25,6 +25,8 @@ jobs:
         environment-name: test-env
         create-args: >-
           python=3.10
+          pandas=1
+          numpy
           pip
 
     - name: Install
