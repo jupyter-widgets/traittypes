@@ -149,7 +149,7 @@ class TestSeries(TestCase):
     def test_series_equal(self):
         notifications = []
         class Foo(HasTraits):
-            bar = Series([1, 2])
+            bar = Series([1, 2], dtype=np.int64)
             @observe('bar')
             def _(self, change):
                 notifications.append(change)

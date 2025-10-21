@@ -155,18 +155,20 @@ class PandasType(SciType):
                 not old_value.equals(new_value)):
             obj._notify_trait(self.name, old_value, new_value)
 
-    def __init__(self, default_value=Empty, allow_none=False, klass=None, **kwargs):
+    def __init__(self, default_value=Empty, allow_none=False, klass=None, klass_kwargs=None, **kwargs):
         if klass is None:
             klass = self.klass
+        if klass_kwargs is None:
+            klass_kwargs = {}
         if (klass is not None) and inspect.isclass(klass):
             self.klass = klass
         else:
             raise TraitError('The klass attribute must be a class'
                                 ' not: %r' % klass)
         if default_value is Empty:
-            default_value = klass()
+            default_value = klass(**klass_kwargs)
         elif default_value is not None and default_value is not Undefined:
-            default_value = klass(default_value)
+            default_value = klass(default_value, **klass_kwargs)
         super(PandasType, self).__init__(default_value=default_value, allow_none=allow_none, **kwargs)
 
     def make_dynamic_default(self):
@@ -198,12 +200,12 @@ class Series(PandasType):
     info_text = 'a pandas series'
     dtype = None
 
-    def __init__(self, default_value=Empty, allow_none=False, dtype=None, **kwargs):
+    def __init__(self, default_value=Empty, allow_none=False, dtype=np.float64, **kwargs):
         if 'klass' not in kwargs and self.klass is None:
             import pandas as pd
             kwargs['klass'] = pd.Series
         super(Series, self).__init__(
-            default_value=default_value, allow_none=allow_none, **kwargs)
+            default_value=default_value, allow_none=allow_none, klass_kwargs={"dtype": dtype}, **kwargs)
         self.tag(dtype=dtype)
         self.dtype = dtype
 
