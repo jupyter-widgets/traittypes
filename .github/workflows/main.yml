@@ -24,11 +24,15 @@ jobs:
       with:
         environment-name: test-env
         create-args: >-
-          python=3.13
+          python
           pip
+          pandas
+          numpy
+          xarray
+          pytest
 
     - name: Install
-      run: pip install eager ".[test]" coveralls pytest-cov
+      run: pip install eager . coveralls pytest-cov
 
     - name: Test coverage
       run: pytest --cov=traittypes traittypes
