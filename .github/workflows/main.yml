@@ -24,10 +24,10 @@ jobs:
       with:
         environment-name: test-env
         create-args: >-
-          python
+          python=3.11
           pip
-          pandas
-          numpy
+          pandas=1
+          numpy=1
           xarray
           pytest
 
