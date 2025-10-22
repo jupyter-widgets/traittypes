@@ -200,10 +200,12 @@ class Series(PandasType):
     info_text = 'a pandas series'
     dtype = None
 
-    def __init__(self, default_value=Empty, allow_none=False, dtype=np.float64, **kwargs):
+    def __init__(self, default_value=Empty, allow_none=False, dtype=None, **kwargs):
         if 'klass' not in kwargs and self.klass is None:
             import pandas as pd
             kwargs['klass'] = pd.Series
+        if dtype is None:
+            dtype = np.float64
         super(Series, self).__init__(
             default_value=default_value, allow_none=allow_none, klass_kwargs={"dtype": dtype}, **kwargs)
         self.tag(dtype=dtype)
